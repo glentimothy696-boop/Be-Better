@@ -50,7 +50,7 @@
             📚
           </div>
           <p class="text-xs text-slate-500 font-medium">Tugas & PR</p>
-          <p class="text-xl font-bold text-slate-800" id="dash-task-count">2 Tersisa</p>
+          <p class="text-xl font-bold text-slate-800" id="dash-task-count">0 Tersisa</p>
         </div>
 
         <div onclick="switchTab('finance')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
@@ -58,7 +58,7 @@
             💸
           </div>
           <p class="text-xs text-slate-500 font-medium">Pengeluaran</p>
-          <p class="text-xl font-bold text-slate-800" id="dash-expense-total">Rp 35.000</p>
+          <p class="text-xl font-bold text-slate-800" id="dash-expense-total">Rp 0</p>
         </div>
 
         <div onclick="switchTab('workout')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
@@ -107,15 +107,15 @@
     <section id="tab-finance" class="space-y-6 hidden">
       <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md">
         <p class="text-xs md:text-sm text-slate-400">💰 Sisa Anggaran Bulan Ini</p>
-        <h2 class="text-3xl font-bold text-emerald-400 mt-1">Rp 465.000</h2>
+        <h2 class="text-3xl font-bold text-emerald-400 mt-1" id="finance-balance">Rp 0</h2>
         <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-800 text-xs md:text-sm">
           <div>
             <span class="text-slate-400 block">📥 Pemasukan</span>
-            <span class="text-emerald-400 font-semibold text-base">+ Rp 500.000</span>
+            <span class="text-emerald-400 font-semibold text-base" id="finance-total-in">+ Rp 0</span>
           </div>
           <div>
             <span class="text-slate-400 block">📤 Pengeluaran</span>
-            <span class="text-rose-400 font-semibold text-base" id="finance-total-out">- Rp 35.000</span>
+            <span class="text-rose-400 font-semibold text-base" id="finance-total-out">- Rp 0</span>
           </div>
         </div>
       </div>
@@ -304,7 +304,7 @@
   </nav>
 
   <script>
-    // App State Data
+    // App State Data Initial
     let tasks = [
       { id: 1, title: 'Latihan Soal Ekonomi OSN', cat: 'Sekolah', deadline: '2026-09-29', done: false, priority: true },
       { id: 2, title: 'Ringkasan Materi Sosiologi', cat: 'Sekolah', deadline: '2026-09-30', done: false, priority: true },
@@ -317,8 +317,9 @@
     ];
 
     let transactions = [
-      { id: 1, title: 'Beli Buku Catatan', amount: 15000, type: 'out', date: 'Hari ini' },
-      { id: 2, title: 'Makan Siang Kantin', amount: 20000, type: 'out', date: 'Hari ini' }
+      { id: 1, title: 'Uang Saku Bulan Ini', amount: 500000, type: 'in', date: 'Hari ini' },
+      { id: 2, title: 'Beli Buku Catatan', amount: 15000, type: 'out', date: 'Hari ini' },
+      { id: 3, title: 'Makan Siang Kantin', amount: 20000, type: 'out', date: 'Hari ini' }
     ];
 
     let waterLiters = 1.5;
@@ -482,15 +483,20 @@
       renderWorkouts();
     }
 
-    // Finance Logic
+    // Finance Logic Dynamic Calculation
     function renderFinance() {
       const listEl = document.getElementById('transaction-list');
       listEl.innerHTML = '';
 
+      let totalIn = 0;
       let totalOut = 0;
 
       transactions.forEach(t => {
-        if(t.type === 'out') totalOut += t.amount;
+        if(t.type === 'in') {
+          totalIn += t.amount;
+        } else {
+          totalOut += t.amount;
+        }
 
         listEl.innerHTML += `
           <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex items-center justify-between shadow-sm">
@@ -510,6 +516,11 @@
         `;
       });
 
+      const balance = totalIn - totalOut;
+
+      // Update UI Text Elements dynamically
+      document.getElementById('finance-balance').innerText = `Rp ${balance.toLocaleString('id-ID')}`;
+      document.getElementById('finance-total-in').innerText = `+ Rp ${totalIn.toLocaleString('id-ID')}`;
       document.getElementById('finance-total-out').innerText = `- Rp ${totalOut.toLocaleString('id-ID')}`;
       document.getElementById('dash-expense-total').innerText = `Rp ${totalOut.toLocaleString('id-ID')}`;
     }
